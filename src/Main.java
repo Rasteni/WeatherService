@@ -21,8 +21,7 @@ public class Main {
     private static void findLatLon() throws IOException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Введите координаты широты (lat) и долготы (lon), " +
-                "где вы хотите узнать погоду:");
+        System.out.println("Передайте координаты точек широты и долготы, в которых вы хотите определить погоду");
         System.out.print("lat: ");
         String lat = scanner.next();
         System.out.print("lon: ");
@@ -31,7 +30,7 @@ public class Main {
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(URL + "?lat=" + lat + "&lon=" + lon))
-                .header("X-Yandex-Weather-Key", "dba9eca8-bb43-447b-81bb-e0f1de525b8b")
+                .header("X-Yandex-Weather-Key", "dba9eca8-bb43-447b-81bb-e0f1de525b8b") // Замените на ваш API-ключ
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -41,8 +40,16 @@ public class Main {
         String responseBody = response.body();
         System.out.println(responseBody);
 
-        String tempAvg = findAvgInBody(responseBody);
+        // Извлечение текущей температуры
+        String currentTemp = extractCurrentTemp(responseBody);
+        if (!currentTemp.isEmpty()) {
+            System.out.println("Текущая температура: " + currentTemp + "°C");
+        } else {
+            System.out.println("Текущая температура не найдена в ответе.");
+        }
 
+        // Извлечение средней температуры
+        String tempAvg = findAvgInBody(responseBody);
         if (!tempAvg.isEmpty()) {
             System.out.println("Средняя температура: " + tempAvg + "°C");
         } else {
@@ -52,13 +59,29 @@ public class Main {
         scanner.close();
     }
 
+    private static String extractCurrentTemp(String body) {
+        body = body.trim();
+        if (body.startsWith("{") && body.endsWith("}")) {
+            body = body.substring(1, body.length() - 1);
+            String[] keyValuePairs = body.split(",");
+            for (String keyValuePair : keyValuePairs) {
+                String[] parts = keyValuePair.split(":", 2);
+                String key = parts[0].trim().replaceAll("[{\"}]", "");
+                if (key.equals("temp")) {
+                    return parts[1].trim().replaceAll("[{\"}]", "");
+                }
+            }
+        }
+        return "";
+    }
+
     private static String findAvgInBody(String body) {
         body = body.trim();
         if (body.startsWith("{") && body.endsWith("}")) {
             body = body.substring(1, body.length() - 1);
             String[] keyValuePairs = body.split(",");
             for (String keyValuePair : keyValuePairs) {
-                String[] parts = keyValuePair.split(":");
+                String[] parts = keyValuePair.split(":", 2);
                 String key = parts[0].trim().replaceAll("[{\"}]", "");
                 if (key.equals("temp_avg")) {
                     return parts[1].trim().replaceAll("[{\"}]", "");
