@@ -40,7 +40,6 @@ public class Main {
         String responseBody = response.body();
         System.out.println(responseBody);
 
-        // Извлечение текущей температуры
         String currentTemp = extractCurrentTemp(responseBody);
         if (!currentTemp.isEmpty()) {
             System.out.println("Текущая температура: " + currentTemp + "°C");
@@ -48,7 +47,6 @@ public class Main {
             System.out.println("Текущая температура не найдена в ответе.");
         }
 
-        // Извлечение средней температуры
         String tempAvg = findAvgInBody(responseBody);
         if (!tempAvg.isEmpty()) {
             System.out.println("Средняя температура: " + tempAvg + "°C");
