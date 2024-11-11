@@ -30,7 +30,7 @@ public class Main {
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(URL + "?lat=" + lat + "&lon=" + lon))
-                .header("X-Yandex-Weather-Key", "dba9eca8-bb43-447b-81bb-e0f1de525b8b") // Замените на ваш API-ключ
+                .header("X-Yandex-Weather-Key", "dba9eca8-bb43-447b-81bb-e0f1de525b8b") 
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
